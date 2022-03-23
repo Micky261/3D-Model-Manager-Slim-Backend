@@ -19,6 +19,7 @@ require __DIR__ . '/../vendor/autoload.php';
  */
 spl_autoload_register(function ($class_name) {
     if (file_exists(__DIR__ . "/../$class_name.php")) {
+        /** @noinspection PhpIncludeInspection */
         require __DIR__ . "/../$class_name.php";
         return true;
     }
@@ -28,11 +29,11 @@ spl_autoload_register(function ($class_name) {
 $app = AppFactory::create();
 
 // Catch CORS Options requests
-$app->options('/{routes:.+}', function ($request, $response, $args) {
+$app->options('/{routes:.+}', function ($response) {
     return $response;
 });
 
-$app->get('/version', function ($request, $response, $args) {
+$app->get('/version', function ($request, $response) {
     $response->getBody()->write("0.1.0");
     return $response;
 });
@@ -126,7 +127,7 @@ $app->group("/api", function (RouteCollectorProxy $group) {
  * Catch-all route to serve a 404 Not Found page if none of the routes match
  * NOTE: make sure this route is defined last
  */
-$app->map(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], '/{routes:.+}', function ($request, $response) {
+$app->map(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], '/{routes:.+}', function ($request) {
     throw new HttpNotFoundException($request);
 });
 

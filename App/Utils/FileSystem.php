@@ -6,7 +6,7 @@ class FileSystem {
     /**
      * https://stackoverflow.com/a/1833681
      * @param string $path Path to delete
-     * @return bool Deletion successfull
+     * @return bool Deletion successful
      */
     public static function RemoveEmptySubFolders(string $path): bool {
         $empty = true;

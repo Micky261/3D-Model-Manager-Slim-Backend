@@ -5,12 +5,13 @@ namespace App\Middleware;
 use App\Models\ServerMessage;
 use App\Utils\DB;
 use FaaPz\PDO\Clause\Conditional;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Psr7\Response;
 
 class VerifiedMiddleware {
-    public function __invoke(Request $request, RequestHandler $handler): Response {
+    public function __invoke(Request $request, RequestHandler $handler): ResponseInterface {
         $userId = $request->getAttribute("session")["user_id"];
 
         $userQuery = DB::connection()->select()->from("users")->where(new Conditional("id", "=", $userId));

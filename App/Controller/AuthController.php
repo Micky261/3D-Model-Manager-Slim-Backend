@@ -11,8 +11,8 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 class AuthController {
     // TODO: Delete session on logout
 
-    public function register(Request $request, Response $response, $args) {
-        $body = $request->getParsedBody();
+    public function register(Request $request) {
+        // $body = $request->getParsedBody();
         // TODO
         /**if (User::where("email", $request->email)->exists()) {
          * return response()->json(new ServerMessage([
@@ -42,7 +42,7 @@ class AuthController {
          * ]));**/
     }
 
-    public function login(Request $request, Response $response, $args): Response {
+    public function login(Request $request, Response $response): Response {
         $body = $request->getParsedBody();
 
         $db = DB::connection();

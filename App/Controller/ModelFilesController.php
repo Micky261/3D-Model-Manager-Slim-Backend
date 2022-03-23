@@ -62,7 +62,7 @@ class ModelFilesController {
 
         if ($stmt = $this->selectFile($fileId, $userId)) {
             $file = $stmt->fetch();
-            $filepath = "../upload/{$userId}/{$file["model_id"]}/{$file["type"]}/{$file["filename"]}";
+            $filepath = "../upload/$userId/{$file["model_id"]}/{$file["type"]}/{$file["filename"]}";
 
             if (file_exists($filepath)) {
                 $fileStream = new LazyOpenStream($filepath, "r");
@@ -96,7 +96,7 @@ class ModelFilesController {
             ->execute()->fetch();
 
         if ($file !== false) {
-            $filepath = "../upload/{$userId}/{$modelId}/{$file["type"]}/{$file["filename"]}";
+            $filepath = "../upload/$userId/$modelId/{$file["type"]}/{$file["filename"]}";
 
             if (file_exists($filepath)) {
                 $fileStream = new LazyOpenStream($filepath, "r");
@@ -125,7 +125,7 @@ class ModelFilesController {
 
         if ($stmt = $this->selectFile($fileId, $userId)) {
             $file = $stmt->fetch();
-            $filepath = "../upload/{$userId}/{$file["model_id"]}/{$file["type"]}/{$file["filename"]}";
+            $filepath = "../upload/$userId/{$file["model_id"]}/{$file["type"]}/{$file["filename"]}";
 
             if (file_exists($filepath)) {
                 if (unlink($filepath)) {
@@ -168,8 +168,8 @@ class ModelFilesController {
                 $newFileType = $newFileData["type"];
                 $newFileName = $newFileData["filename"];
 
-                $oldFile = "../upload/{$userId}/{$modelId}/{$oldFileType}/{$oldFileName}";
-                $newFileDir = "../upload/{$userId}/{$modelId}/{$newFileType}/";
+                $oldFile = "../upload/$userId/$modelId/$oldFileType/$oldFileName";
+                $newFileDir = "../upload/$userId/$modelId/$newFileType/";
                 $newFile = $newFileDir . $newFileName;
 
                 $updated = false;
@@ -235,19 +235,19 @@ class ModelFilesController {
         $modelId = $args["id"];
         $type = $args["type"];
 
-        $basePath = "../upload/{$userId}/{$modelId}/" . (($type == "all") ? "" : "{$type}/");
+        $basePath = "../upload/$userId/$modelId/" . (($type == "all") ? "" : "$type/");
 
         if (is_dir($basePath)) {
             $zipPath = "../upload_temp/zips/";
             if (!is_dir($zipPath)) mkdir($zipPath, 0755, true);
-            $zipFilePath = "{$zipPath}{$userId}_{$modelId}.zip";
+            $zipFilePath = "$zipPath{$userId}_$modelId.zip";
             if (file_exists($zipFilePath)) unlink($zipFilePath);
 
             $zip = new ZipFile();
             try {
-                $zip->addDirRecursive($basePath, "/")
+                $zip->addDirRecursive($basePath)
                     ->saveAsFile($zipFilePath);
-            } catch (ZipException $e) {
+            } catch (ZipException) {
                 return $response->withStatus(500);
             }
 
@@ -268,7 +268,7 @@ class ModelFilesController {
         $type = $body["type"];
 
         // Check whether the same file exists already
-        $targetFilePath = "../upload/{$userId}/{$modelId}/{$type}/{$filename}";
+        $targetFilePath = "../upload/$userId/$modelId/$type/$filename";
         if (file_exists($targetFilePath)) {
             $response->getBody()->write((new ServerMessage(
                 "Target path already exists.",
@@ -277,21 +277,21 @@ class ModelFilesController {
             return $response->withStatus(409);
         } else { // File doesn't exist
             $time = $body["timestamp"];
-            $chunkPath = "../upload_temp/chunked/{$userId}/{$time}/";
+            $chunkPath = "../upload_temp/chunked/$userId/$time/";
             if (!is_dir($chunkPath)) mkdir($chunkPath, 0755, true);
 
             $chunk = $body["chunk"];
             $total = $body["totalChunks"];
 
             $file = $request->getUploadedFiles()["file"];
-            $chunkName = "{$chunk}__{$filename}";
+            $chunkName = "{$chunk}__$filename";
             $file->moveTo($chunkPath . $chunkName);
 
             if (($chunk + 1) == $total) {
                 $targetFile = fopen($targetFilePath, "x");
 
                 for ($i = 0; $i < $total; $i++) {
-                    $chunkFilePath = "{$chunkPath}/{$i}__{$filename}";
+                    $chunkFilePath = "$chunkPath/{$i}__$filename";
                     $chunkFile = fopen($chunkFilePath, "r");
                     fwrite($targetFile, fread($chunkFile, filesize($chunkFilePath)));
                     fclose($chunkFile);

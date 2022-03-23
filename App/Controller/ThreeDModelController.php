@@ -11,7 +11,7 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
 class ThreeDModelController {
-    public function getAllModels(Request $request, Response $response, $args): Response {
+    public function getAllModels(Request $request, Response $response): Response {
         $userId = $request->getAttribute("sessionUserId");
 
         $models = DB::connection()->select()->from("models")
@@ -22,7 +22,7 @@ class ThreeDModelController {
         return $response;
     }
 
-    public function createModel(Request $request, Response $response, $args): Response {
+    public function createModel(Request $request, Response $response): Response {
         $userId = $request->getAttribute("sessionUserId");
         $body = $request->getParsedBody();
 
@@ -70,8 +70,8 @@ class ThreeDModelController {
             ->fetch();
     }
 
-    public function importModel(Request $request, Response $response, $args): Response {
-        $userId = $request->getAttribute("sessionUserId");
+    public function importModel(Request $request, Response $response): Response {
+        // $userId = $request->getAttribute("sessionUserId");
         $body = $request->getParsedBody();
 
         $response->getBody()->write($body);

@@ -9,7 +9,7 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
 class ModelTagsController {
-    public function getAllTags(Request $request, Response $response, $args): Response {
+    public function getAllTags(Request $request, Response $response): Response {
         $userId = $request->getAttribute("sessionUserId");
 
         $tags = DB::connection()->select(['tag', "count" => 'COUNT(tag)'])
