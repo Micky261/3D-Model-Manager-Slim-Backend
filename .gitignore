@@ -1,0 +1,6 @@
+/vendor
+/.idea
+app-config.json
+upload/*/*
+upload_temp/*/*
+.run

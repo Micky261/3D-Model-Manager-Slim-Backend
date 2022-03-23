@@ -1,0 +1,30 @@
+{
+    "general": {
+        "enable-cors": false
+    },
+    "database": {
+        "db": "mysql",
+        "host": "localhost",
+        "port": "3306",
+        "name": "db_name",
+        "username": "username",
+        "password": "password"
+    },
+    "mail": {
+        "mailer": "smtp",
+        "host": "smtp.server.com",
+        "port": "587",
+        "encryption": "tls",
+        "username": "user@example.com",
+        "password": "password",
+        "from_address": "user@example.com",
+        "from_name": "3DMM (Dev)"
+    },
+    "importer": {
+        "myminifactory": {
+            "enabled": false,
+            "api_key": ""
+        }
+    }
+}
+D
