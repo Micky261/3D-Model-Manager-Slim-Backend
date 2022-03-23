@@ -7,6 +7,7 @@ use App\Utils\DB;
 use App\Utils\FileSystem;
 use FaaPz\PDO\Clause\Conditional;
 use FaaPz\PDO\Clause\Grouping;
+use FaaPz\PDO\Clause\Limit;
 use GuzzleHttp\Psr7\LazyOpenStream;
 use PDOStatement;
 use PhpZip\Exception\ZipException;
@@ -75,6 +76,36 @@ class ModelFilesController {
             additional_information: $fileId
         ))->toJson());
         return $response->withStatus(409);
+    }
+
+    public function getMainImage(Request $request, Response $response, $args): Response {
+        $userId = $request->getAttribute("sessionUserId");
+        $modelId = $args["id"];
+
+        $file = DB::connection()
+            ->select()
+            ->from("model_files")
+            ->where(new Grouping(
+                "AND",
+                new Conditional("model_id", "=", $modelId),
+                new Conditional("user_id", "=", $userId),
+                new Conditional("type", "=", "image")
+            ))
+            ->orderBy("position", "ASC")
+            ->limit(new Limit(1))
+            ->execute()->fetch();
+
+        if ($file !== false) {
+            $filepath = "../upload/{$userId}/{$modelId}/{$file["type"]}/{$file["filename"]}";
+
+            if (file_exists($filepath)) {
+                $fileStream = new LazyOpenStream($filepath, "r");
+                return $response->withBody($fileStream);
+            }
+        }
+
+        $fileStream = new LazyOpenStream("./assets/no_image.png", "r");
+        return $response->withBody($fileStream);
     }
 
     private function selectFile(int $fileId, int $userId): bool|PDOStatement {

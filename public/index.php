@@ -103,6 +103,8 @@ $app->group("/api", function (RouteCollectorProxy $group) {
             // Download a zip file including all files of the specified file-type for the given model
             $group->get("/zip/{id:[0-9]+}/{type}", [ModelFilesController::class, "downloadZipFile"]);
 
+            // Download main image
+            $group->get("/file/main/{id:[0-9]+}", [ModelFilesController::class, "getMainImage"]);
             // Download a single file
             $group->get("/file/{fileId:[0-9]+}", [ModelFilesController::class, "getFile"]);
             // Save a file for a model
