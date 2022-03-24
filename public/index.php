@@ -75,8 +75,6 @@ $app->group("/api", function (RouteCollectorProxy $group) {
             $group->get("/data/{id:[0-9]+}", [ModelController::class, "getModel"]);
             // Create a model (data via POST)
             $group->post("/data", [ModelController::class, "createModel"]);
-            // Start import of a model from a 3d file vendor
-            $group->post("/import", [ModelController::class, "importModel"]);
             // Update the specified model
             $group->put("/data/{id:[0-9]+}", [ModelController::class, "updateModel"]);
             // Delete specified model

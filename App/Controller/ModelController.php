@@ -35,14 +35,6 @@ class ModelController {
         return $response;
     }
 
-    public function importModel(Request $request, Response $response): Response {
-        // $userId = $request->getAttribute("sessionUserId");
-        $body = $request->getParsedBody();
-
-        $response->getBody()->write($body);
-        return $response;
-    }
-
     public function getModel(Request $request, Response $response, $args): Response {
         $userId = $request->getAttribute("sessionUserId");
         $modelId = $args["id"];
