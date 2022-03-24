@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Models\Model;
-use App\Models\ServerMessage;
 use App\Utils\DB;
 use FaaPz\PDO\Clause\Conditional;
 use FaaPz\PDO\Clause\Grouping;
@@ -29,15 +28,10 @@ class ModelController {
 
         $modelId = Model::createModel($userId, $body["name"], $body["links"], $body["description"], $body["notes"], $body["favorite"], $body["author"], $body["licence"]);
 
-        if ($modelId > 0) {
-            $model = Model::getModel($userId, $modelId);
-            $model["links"] = json_decode($model["links"]);
+        $model = Model::getModel($userId, $modelId);
+        $model["links"] = json_decode($model["links"]);
 
-            $response->getBody()->write(json_encode($model, true));
-            return $response;
-        }
-
-        $response->getBody()->write(ServerMessage::unknownError(ModelController::class, __LINE__)->toJson());
+        $response->getBody()->write(json_encode($model, true));
         return $response;
     }
 

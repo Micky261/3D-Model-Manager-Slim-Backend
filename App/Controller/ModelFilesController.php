@@ -49,7 +49,7 @@ class ModelFilesController {
         $fileId = $args["fileId"];
 
         $file = ModelFile::getFile($userId, $fileId);
-        $filepath = "../upload/$userId/{$file["model_id"]}/{$file["type"]}/{$file["filename"]}";
+        $filepath = ModelFile::getFilePath($userId, $file["model_id"], $file["type"], $file["filename"]);
 
         if (file_exists($filepath)) {
             $fileStream = new LazyOpenStream($filepath, "r");
@@ -82,7 +82,7 @@ class ModelFilesController {
             ->execute()->fetch();
 
         if ($file !== false) {
-            $filepath = "../upload/$userId/$modelId/{$file["type"]}/{$file["filename"]}";
+            $filepath = ModelFile::getFilePath($userId, $modelId, $file["type"], $file["filename"]);
 
             if (file_exists($filepath)) {
                 $fileStream = new LazyOpenStream($filepath, "r");
@@ -100,7 +100,7 @@ class ModelFilesController {
         $fileId = $args["fileId"];
 
         $file = ModelFile::getFile($userId, $fileId);
-        $filepath = "../upload/$userId/{$file["model_id"]}/{$file["type"]}/{$file["filename"]}";
+        $filepath = ModelFile::getFilePath($userId, $file["model_id"], $file["type"], $file["filename"]);
 
         if (file_exists($filepath)) {
             if (unlink($filepath)) {
@@ -135,16 +135,16 @@ class ModelFilesController {
             $newPosition = $newFileData["position"];
 
             $oldFileData = ModelFile::getFile($userId, $fileId);
-            if (!is_null($newFileData["type"]) && !$oldFileData) {
+            if (!is_null($newFileData["type"]) && $oldFileData != false) {
                 $oldPosition = $oldFileData["position"];
                 $oldFileType = $oldFileData["type"];
                 $oldFileName = $oldFileData["filename"];
                 $newFileType = $newFileData["type"];
                 $newFileName = $newFileData["filename"];
 
-                $oldFile = "../upload/$userId/$modelId/$oldFileType/$oldFileName";
-                $newFileDir = "../upload/$userId/$modelId/$newFileType/";
-                $newFile = $newFileDir . $newFileName;
+                $oldFile = ModelFile::getFilePath($userId, $modelId, $oldFileType, $oldFileName);
+                $newFileDir = ModelFile::getFileTypePath($userId, $modelId, $newFileType);
+                $newFile = ModelFile::getFilePath($userId, $modelId, $newFileType, $newFileName);
 
                 $updated = false;
 
@@ -209,7 +209,7 @@ class ModelFilesController {
         $modelId = $args["id"];
         $type = $args["type"];
 
-        $basePath = "../upload/$userId/$modelId/" . (($type == "all") ? "" : "$type/");
+        $basePath = ModelFile::getFileBasePath($userId, $modelId) . (($type == "all") ? "" : "$type/");
 
         if (is_dir($basePath)) {
             $zipPath = "../upload_temp/zips/";
@@ -242,7 +242,7 @@ class ModelFilesController {
         $type = $body["type"];
 
         // Check whether the same file exists already
-        $targetFilePath = "../upload/$userId/$modelId/$type/$filename";
+        $targetFilePath = ModelFile::getFilePath($userId, $modelId, $type, $filename);
         if (file_exists($targetFilePath)) {
             $response->getBody()->write((new ServerMessage(
                 "Target path already exists.",
@@ -274,11 +274,7 @@ class ModelFilesController {
 
                 fclose($targetFile);
 
-                DB::connection()
-                    ->insert(["user_id", "model_id", "type", "filename", "position", "size"])
-                    ->into("model_files")
-                    ->values($userId, $modelId, $type, $filename, 999, filesize($targetFilePath))
-                    ->execute();
+                ModelFile::createFileDBEntry($userId, $modelId, $type, $filename, filesize($targetFilePath));
             }
         }
 
