@@ -3,7 +3,7 @@
 use App\Controller\AuthController;
 use App\Controller\ModelFilesController;
 use App\Controller\ModelTagsController;
-use App\Controller\ThreeDModelController;
+use App\Controller\ModelController;
 use App\Controller\VerificationController;
 use App\Middleware\AuthMiddleware;
 use App\Middleware\CORSMiddleware;
@@ -59,11 +59,11 @@ $app->group("/api", function (RouteCollectorProxy $group) {
          */
         $group->group("/models", function (RouteCollectorProxy $group) {
             // Get all models
-            $group->get("", [ThreeDModelController::class, "getAllModels"]);
+            $group->get("", [ModelController::class, "getAllModels"]);
             // Get a list of {num} random models
-            $group->get("/random/{num:[0-9]+}", [ThreeDModelController::class, "getRandomModels"]);
+            $group->get("/random/{num:[0-9]+}", [ModelController::class, "getRandomModels"]);
             // Get a list of the {num} newest models
-            $group->get("/newest/{num:[0-9]+}", [ThreeDModelController::class, "getNewestModels"]);
+            $group->get("/newest/{num:[0-9]+}", [ModelController::class, "getNewestModels"]);
         });
 
         /**
@@ -71,15 +71,15 @@ $app->group("/api", function (RouteCollectorProxy $group) {
          */
         $group->group("/model", function (RouteCollectorProxy $group) {
             // Get data for the specified model
-            $group->get("/data/{id:[0-9]+}", [ThreeDModelController::class, "getModel"]);
+            $group->get("/data/{id:[0-9]+}", [ModelController::class, "getModel"]);
             // Create a model (data via POST)
-            $group->post("/data", [ThreeDModelController::class, "createModel"]);
+            $group->post("/data", [ModelController::class, "createModel"]);
             // Start import of a model from a 3d file vendor
-            $group->post("/import", [ThreeDModelController::class, "importModel"]);
+            $group->post("/import", [ModelController::class, "importModel"]);
             // Update the specified model
-            $group->put("/data/{id:[0-9]+}", [ThreeDModelController::class, "updateModel"]);
+            $group->put("/data/{id:[0-9]+}", [ModelController::class, "updateModel"]);
             // Delete specified model
-            $group->delete("/{id:[0-9]+}", [ThreeDModelController::class, "deleteModel"]);
+            $group->delete("/{id:[0-9]+}", [ModelController::class, "deleteModel"]);
 
             /**
              * Tags for Model

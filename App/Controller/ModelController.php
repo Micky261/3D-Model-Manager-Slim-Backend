@@ -10,7 +10,7 @@ use FaaPz\PDO\Clause\Limit;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
-class ThreeDModelController {
+class ModelController {
     public function getAllModels(Request $request, Response $response): Response {
         $userId = $request->getAttribute("sessionUserId");
 
@@ -51,7 +51,7 @@ class ThreeDModelController {
             return $response;
         }
 
-        $response->getBody()->write(ServerMessage::unknownError(ThreeDModelController::class, __LINE__)->toJson());
+        $response->getBody()->write(ServerMessage::unknownError(ModelController::class, __LINE__)->toJson());
         return $response;
     }
 
