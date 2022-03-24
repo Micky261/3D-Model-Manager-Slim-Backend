@@ -133,8 +133,6 @@ class Thingiverse {
     public function getThing($id) {
         $this->url = self::BASE_URL . 'things/' . $id;
 
-
-
         return $this->_send();
     }
 
