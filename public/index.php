@@ -8,6 +8,7 @@ use App\Controller\ModelController;
 use App\Controller\VerificationController;
 use App\Middleware\AuthMiddleware;
 use App\Middleware\CORSMiddleware;
+use App\Middleware\ContentTypeMiddleware;
 use App\Middleware\VerifiedMiddleware;
 use Slim\Exception\HttpNotFoundException;
 use Slim\Factory\AppFactory;
@@ -36,7 +37,7 @@ $app->options('/{routes:.+}', function ($response) {
 
 $app->get('/version', function ($request, $response) {
     $response->getBody()->write("0.1.0");
-    return $response;
+    return $response->withHeader("Content-Type", "text/plain");
 });
 
 // API
@@ -141,7 +142,7 @@ $app->map(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], '/{routes:.+}', function ($
 });
 
 $app->addErrorMiddleware(false, true, true);
-// Add CORS middleware
+$app->add(new ContentTypeMiddleware());
 $app->add(new CORSMiddleware());
 $app->addBodyParsingMiddleware(); // Replaceable with json_decode($request->getBody()->getContents(),true)
 

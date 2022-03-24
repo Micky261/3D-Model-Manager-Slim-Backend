@@ -45,6 +45,6 @@ class AuthMiddleware {
         // Path param missing or no session found
         $r = new Response();
         $r->getBody()->write((new ServerMessage("Error on auth", "AUTH_ERROR"))->toJson());
-        return $r->withStatus(405)->withHeader("Content-Type", "application/json");
+        return $r->withStatus(405);
     }
 }

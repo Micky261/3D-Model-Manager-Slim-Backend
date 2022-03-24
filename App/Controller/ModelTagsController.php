@@ -39,10 +39,10 @@ class ModelTagsController {
             $tagRow = ModelTag::getTag($userId, $modelId, $tag);
 
             $response->getBody()->write(json_encode($tagRow));
-            return $response->withStatus(200);
+            return $response;
         }
 
-        return $response->withStatus(200);
+        return $response;
     }
 
 
@@ -62,6 +62,6 @@ class ModelTagsController {
             ))
             ->execute();
 
-        return $response->withStatus(200);
+        return $response;
     }
 }

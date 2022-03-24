@@ -27,6 +27,6 @@ class VerifiedMiddleware {
         // User not found or E-Mail not verified
         $r = new Response();
         $r->getBody()->write((new ServerMessage("Error on auth", "AUTH_ERROR_EMAIL_VERIFICATION"))->toJson());
-        return $r->withStatus(405)->withHeader("Content-Type", "application/json");
+        return $r->withStatus(405);
     }
 }

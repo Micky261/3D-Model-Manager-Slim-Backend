@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Models\FileType;
 use App\Models\ModelFile;
 use App\Models\ServerMessage;
 use App\Utils\DB;
@@ -53,7 +54,7 @@ class ModelFilesController {
 
         if (file_exists($filepath)) {
             $fileStream = new LazyOpenStream($filepath, "r");
-            return $response->withBody($fileStream);
+            return $response->withBody($fileStream)->withHeader("Content-Type", FileType::getMimeTypeFromFilename($file["filename"]));
         }
 
         $response->getBody()->write((new ServerMessage(
@@ -86,12 +87,12 @@ class ModelFilesController {
 
             if (file_exists($filepath)) {
                 $fileStream = new LazyOpenStream($filepath, "r");
-                return $response->withBody($fileStream);
+                return $response->withBody($fileStream)->withHeader("Content-Type", FileType::getMimeTypeFromFilename($file["filename"]));
             }
         }
 
         $fileStream = new LazyOpenStream("./assets/no_image.png", "r");
-        return $response->withBody($fileStream);
+        return $response->withBody($fileStream)->withHeader("Content-Type", FileType::getMimeType("png"));
     }
 
 
@@ -227,7 +228,7 @@ class ModelFilesController {
 
             $zip->close();
             $fileStream = new LazyOpenStream($zipFilePath, "r");
-            return $response->withBody($fileStream);
+            return $response->withBody($fileStream)->withHeader("Content-Type", "application/zip");
         }
 
         return $response->withStatus(404);
