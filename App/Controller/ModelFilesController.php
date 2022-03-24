@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Models\ModelFile;
 use App\Models\ServerMessage;
 use App\Utils\DB;
 use App\Utils\FileSystem;
@@ -9,7 +10,6 @@ use FaaPz\PDO\Clause\Conditional;
 use FaaPz\PDO\Clause\Grouping;
 use FaaPz\PDO\Clause\Limit;
 use GuzzleHttp\Psr7\LazyOpenStream;
-use PDOStatement;
 use PhpZip\Exception\ZipException;
 use PhpZip\ZipFile;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -20,20 +20,8 @@ class ModelFilesController {
         $userId = $request->getAttribute("sessionUserId");
         $modelId = $args["id"];
 
-        $response->getBody()->write(json_encode($this->selectFiles($modelId, $userId)));
+        $response->getBody()->write(json_encode(ModelFile::getFiles($userId, $modelId)));
         return $response;
-    }
-
-    private function selectFiles(int $modelId, int $userId): array {
-        return DB::connection()->select()
-            ->from("model_files")
-            ->where(new Grouping(
-                "AND",
-                new Conditional("model_id", "=", $modelId),
-                new Conditional("user_id", "=", $userId)
-            ))
-            ->execute()
-            ->fetchAll();
     }
 
     public function getFilesWithType(Request $request, Response $response, $args): Response {
@@ -60,14 +48,12 @@ class ModelFilesController {
         $userId = $request->getAttribute("sessionUserId");
         $fileId = $args["fileId"];
 
-        if ($stmt = $this->selectFile($fileId, $userId)) {
-            $file = $stmt->fetch();
-            $filepath = "../upload/$userId/{$file["model_id"]}/{$file["type"]}/{$file["filename"]}";
+        $file = ModelFile::getFile($userId, $fileId);
+        $filepath = "../upload/$userId/{$file["model_id"]}/{$file["type"]}/{$file["filename"]}";
 
-            if (file_exists($filepath)) {
-                $fileStream = new LazyOpenStream($filepath, "r");
-                return $response->withBody($fileStream);
-            }
+        if (file_exists($filepath)) {
+            $fileStream = new LazyOpenStream($filepath, "r");
+            return $response->withBody($fileStream);
         }
 
         $response->getBody()->write((new ServerMessage(
@@ -108,47 +94,35 @@ class ModelFilesController {
         return $response->withBody($fileStream);
     }
 
-    private function selectFile(int $fileId, int $userId): bool|PDOStatement {
-        return DB::connection()->select()
-            ->from("model_files")
-            ->where(new Grouping(
-                "AND",
-                new Conditional("id", "=", $fileId),
-                new Conditional("user_id", "=", $userId)
-            ))
-            ->execute();
-    }
 
     public function deleteFile(Request $request, Response $response, $args): Response {
         $userId = $request->getAttribute("sessionUserId");
         $fileId = $args["fileId"];
 
-        if ($stmt = $this->selectFile($fileId, $userId)) {
-            $file = $stmt->fetch();
-            $filepath = "../upload/$userId/{$file["model_id"]}/{$file["type"]}/{$file["filename"]}";
+        $file = ModelFile::getFile($userId, $fileId);
+        $filepath = "../upload/$userId/{$file["model_id"]}/{$file["type"]}/{$file["filename"]}";
 
-            if (file_exists($filepath)) {
-                if (unlink($filepath)) {
-                    DB::connection()->delete()
-                        ->from("model_files")
-                        ->where(new Grouping(
-                            "AND",
-                            new Conditional("id", "=", $fileId),
-                            new Conditional("user_id", "=", $userId)
-                        ))
-                        ->execute();
-                } else {
-                    $response->getBody()->write((new ServerMessage(
-                        "The file could not be deleted",
-                        "FileCouldNotBeDeleted",
-                        additional_information: $fileId
-                    ))->toJson());
-                    return $response->withStatus(409);
-                }
+        if (file_exists($filepath)) {
+            if (unlink($filepath)) {
+                DB::connection()->delete()
+                    ->from("model_files")
+                    ->where(new Grouping(
+                        "AND",
+                        new Conditional("id", "=", $fileId),
+                        new Conditional("user_id", "=", $userId)
+                    ))
+                    ->execute();
+            } else {
+                $response->getBody()->write((new ServerMessage(
+                    "The file could not be deleted.",
+                    "FileCouldNotBeDeleted",
+                    additional_information: $fileId
+                ))->toJson());
+                return $response->withStatus(409);
             }
         }
 
-        return $response->withStatus(200);
+        return $response;
     }
 
     public function updateFiles(Request $request, Response $response, $args): Response {
@@ -160,8 +134,8 @@ class ModelFilesController {
             $fileId = $newFileData["id"];
             $newPosition = $newFileData["position"];
 
-            if (!is_null($newFileData["type"]) && ($stmt = $this->selectFile($fileId, $userId))) {
-                $oldFileData = $stmt->fetch();
+            $oldFileData = ModelFile::getFile($userId, $fileId);
+            if (!is_null($newFileData["type"]) && !$oldFileData) {
                 $oldPosition = $oldFileData["position"];
                 $oldFileType = $oldFileData["type"];
                 $oldFileName = $oldFileData["filename"];
@@ -226,7 +200,7 @@ class ModelFilesController {
             }
         }
 
-        $response->getBody()->write(json_encode($this->selectFiles($modelId, $userId)));
+        $response->getBody()->write(json_encode(ModelFile::getFiles($userId, $modelId)));
         return $response;
     }
 

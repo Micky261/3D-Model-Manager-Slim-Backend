@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Models\Model;
 use App\Models\ServerMessage;
 use App\Utils\DB;
 use FaaPz\PDO\Clause\Conditional;
@@ -26,25 +27,10 @@ class ModelController {
         $userId = $request->getAttribute("sessionUserId");
         $body = $request->getParsedBody();
 
-        $createQuery = DB::connection()
-            ->insert(
-                ["user_id", "name", "links", "description", "notes", "favorite", "author", "licence"]
-            )
-            ->into("models")
-            ->values(
-                $userId,
-                $body["name"],
-                json_encode($body["links"], true),
-                $body["description"],
-                $body["notes"],
-                var_export($body["favorite"], true),
-                $body["author"],
-                $body["licence"]
-            );
+        $modelId = Model::createModel($userId, $body["name"], $body["links"], $body["description"], $body["notes"], $body["favorite"], $body["author"], $body["licence"]);
 
-        if ($createQuery->execute()) {
-            $modelId = DB::connection()->lastInsertId();
-            $model = $this->selectModel($userId, $modelId);
+        if ($modelId > 0) {
+            $model = Model::getModel($userId, $modelId);
             $model["links"] = json_decode($model["links"]);
 
             $response->getBody()->write(json_encode($model, true));
@@ -53,21 +39,6 @@ class ModelController {
 
         $response->getBody()->write(ServerMessage::unknownError(ModelController::class, __LINE__)->toJson());
         return $response;
-    }
-
-    private function selectModel(int $userId, int $modelId) {
-        return DB::connection()
-            ->select()
-            ->from("models")
-            ->where(
-                new Grouping(
-                    "AND",
-                    new Conditional("id", "=", $modelId),
-                    new Conditional("user_id", "=", $userId)
-                )
-            )
-            ->execute()
-            ->fetch();
     }
 
     public function importModel(Request $request, Response $response): Response {
@@ -82,7 +53,7 @@ class ModelController {
         $userId = $request->getAttribute("sessionUserId");
         $modelId = $args["id"];
 
-        $model = $this->selectModel($userId, $modelId);
+        $model = Model::getModel($userId, $modelId);
         if ($model !== false) {
             $model["links"] = json_decode($model["links"]);
 
@@ -98,7 +69,7 @@ class ModelController {
         $modelId = $args["id"];
         $body = $request->getParsedBody();
 
-        $model = $this->selectModel($userId, $modelId);
+        $model = Model::getModel($userId, $modelId);
         if ($model !== false) {
             DB::connection()
                 ->update([
@@ -119,7 +90,7 @@ class ModelController {
                 ))
                 ->execute();
 
-            $model = $this->selectModel($userId, $modelId);
+            $model = Model::getModel($userId, $modelId);
             $model["links"] = json_decode($model["links"]);
 
             $response->getBody()->write(json_encode($model));
@@ -133,7 +104,7 @@ class ModelController {
         $userId = $request->getAttribute("sessionUserId");
         $modelId = $args["id"];
 
-        $model = $this->selectModel($userId, $modelId);
+        $model = Model::getModel($userId, $modelId);
         if ($model !== false) {
             $model["links"] = json_decode($model["links"]);
 
@@ -147,7 +118,7 @@ class ModelController {
                 ))
                 ->execute();
 
-            $model = $this->selectModel($userId, $modelId);
+            $model = Model::getModel($userId, $modelId);
             $model["links"] = json_decode($model["links"]);
 
             $response->getBody()->write(json_encode($model));
