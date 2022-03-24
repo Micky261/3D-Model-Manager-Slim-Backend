@@ -34,5 +34,5 @@ abstract class BaseImporter {
         };
     }
 
-    public abstract function import(array $args): string;
+    public abstract function import(int $userId, array $args): string;
 }
