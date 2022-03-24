@@ -213,22 +213,23 @@ class ModelFilesController {
         $basePath = ModelFile::getFileBasePath($userId, $modelId) . (($type == "all") ? "" : "$type/");
 
         if (is_dir($basePath)) {
-            $zipPath = "../upload_temp/zips/";
-            if (!is_dir($zipPath)) mkdir($zipPath, 0755, true);
-            $zipFilePath = "$zipPath{$userId}_$modelId.zip";
-            if (file_exists($zipFilePath)) unlink($zipFilePath);
+//            $zipPath = "../upload_temp/zips/";
+//            if (!is_dir($zipPath)) mkdir($zipPath, 0755, true);
+//            $zipFilePath = "$zipPath{$userId}_$modelId.zip";
+//            if (file_exists($zipFilePath)) unlink($zipFilePath);
 
             $zip = new ZipFile();
             try {
-                $zip->addDirRecursive($basePath)
-                    ->saveAsFile($zipFilePath);
+                return $zip->addDirRecursive($basePath)
+                    ->outputAsPsr7Response($response, "zip.zip", "application/zip");
             } catch (ZipException) {
                 return $response->withStatus(500);
             }
 
-            $zip->close();
-            $fileStream = new LazyOpenStream($zipFilePath, "r");
-            return $response->withBody($fileStream)->withHeader("Content-Type", "application/zip");
+//            $zip->saveAsFile($zipFilePath);
+//            $zip->close();
+//            $fileStream = new LazyOpenStream($zipFilePath, "r");
+//            return $response->withBody($fileStream)->withHeader("Content-Type", "application/zip");
         }
 
         return $response->withStatus(404);
