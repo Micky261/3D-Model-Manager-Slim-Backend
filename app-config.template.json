@@ -24,6 +24,10 @@
         "myminifactory": {
             "enabled": false,
             "api_key": ""
+        },
+        "thingiverse": {
+            "enabled": false,
+            "app-token": ""
         }
     }
 }

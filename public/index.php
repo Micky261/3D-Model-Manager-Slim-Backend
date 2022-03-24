@@ -1,6 +1,7 @@
 <?php
 
 use App\Controller\AuthController;
+use App\Controller\ImportController;
 use App\Controller\ModelFilesController;
 use App\Controller\ModelTagsController;
 use App\Controller\ModelController;
@@ -119,6 +120,16 @@ $app->group("/api", function (RouteCollectorProxy $group) {
          */
         // Get all tags
         $group->get("/tags/all", [ModelTagsController::class, "getAllTags"]);
+
+        /**
+         * Import
+         */
+        $group->group("/import", function (RouteCollectorProxy $group) {
+            // Get enabled importers
+            $group->get("/enabled", [ImportController::class, "getEnabledImporters"]);
+            // Import
+            $group->post("/{importer}", [ImportController::class, "import"]);
+        });
     })->add(new VerifiedMiddleware())->add(new AuthMiddleware());
 });
 
