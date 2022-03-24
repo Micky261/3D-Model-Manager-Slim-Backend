@@ -20,6 +20,6 @@ class ThingiverseImporter extends BaseImporter {
     public function import(int $userId, array $args): string {
         $id = $args["id"];
 
-        return;
+        return "";
     }
 }

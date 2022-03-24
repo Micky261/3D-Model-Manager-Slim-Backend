@@ -18,12 +18,15 @@ class ImportController {
      * @throws Exception
      */
     public function import(Request $request, Response $response, $args): Response {
+        $userId = $request->getAttribute("sessionUserId");
         $importer = $args["importer"];
 
         $imp = BaseImporter::getImporter($importer);
 
-        if($imp != null) {
-            $response->getBody()->write(json_encode($imp->import($request->getParsedBody())));
+        if ($imp != null) {
+            $response->getBody()->write(json_encode(
+                $imp->import($userId, $request->getParsedBody())
+            ));
             return $response;
         } else {
             $response->getBody()->write((new ServerMessage("Error on auth", "AUTH_ERROR_EMAIL_VERIFICATION"))->toJson());
