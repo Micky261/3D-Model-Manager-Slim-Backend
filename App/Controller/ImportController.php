@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Models\Model;
 use App\Models\ServerMessage;
 use App\ThreeDModels\Importer\BaseImporter;
 use Exception;
@@ -24,9 +25,12 @@ class ImportController {
         $imp = BaseImporter::getImporter($importer);
 
         if ($imp != null) {
-            $response->getBody()->write(json_encode(
-                $imp->import($userId, $request->getParsedBody())
-            ));
+            $modelId = $imp->import($userId, $request->getParsedBody());
+
+            $model = Model::getModel($userId, $modelId);
+            $model["links"] = json_decode($model["links"]);
+
+            $response->getBody()->write(json_encode($model));
             return $response;
         } else {
             $response->getBody()->write((new ServerMessage("Error on auth", "AUTH_ERROR_EMAIL_VERIFICATION"))->toJson());
