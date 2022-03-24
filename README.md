@@ -10,6 +10,13 @@ The frontend ([3D Model Manager Frontend](https://github.com/Micky261/3d-model-m
 
 The frontend and backend are completely separated and shall work independently, which means that you should be able to set up a frontend yourself and use any available 3D Model Manager API available. (CORS and CSRF-protection not fully developed yet!)
 
+## Importer
+### Thingiverse
+Register an app on [Thingiverse](https://www.thingiverse.com/apps/create). After the creation you will get an App Token, which needs to be put into the `app-config.json` file.
+
+Please note that this app token is for your personal use (testing/development). Logging in with the API is not possible yet.<br />
+It works, because only read-only API endpoints are used.
+
 ## Developer setup
 ### Dependencies
 Check out the repository and in the root directory install all dependencies with
