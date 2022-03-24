@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Models\Model;
 use App\Models\ServerMessage;
-use App\ThreeDModels\Importer\BaseImporter;
+use App\Importer\BaseImporter;
 use Exception;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;

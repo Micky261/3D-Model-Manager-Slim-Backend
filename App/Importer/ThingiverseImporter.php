@@ -1,6 +1,6 @@
 <?php
 
-namespace App\ThreeDModels\Importer;
+namespace App\Importer;
 
 use App\Api\Thingiverse\Thingiverse;
 use App\Models\Model;
