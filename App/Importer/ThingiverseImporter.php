@@ -3,6 +3,7 @@
 namespace App\Importer;
 
 use App\Api\Thingiverse\Thingiverse;
+use App\Models\FileType;
 use App\Models\Model;
 use App\Models\ModelFile;
 use App\Models\ModelTag;
@@ -56,6 +57,10 @@ class ThingiverseImporter extends BaseImporter {
 
             foreach ($image->sizes as $imageSize) {
                 if ($imageSize->type === "display" && $imageSize->size === "large") {
+                    if (count(explode(".",$filename)) == 1) {
+                        $filename .= "." . pathinfo($imageSize->url, PATHINFO_EXTENSION);
+                    }
+
                     $size = ModelFile::moveFileOnDisk($imageSize->url, $path, $filename);
 
                     if ($size != false) {
@@ -71,6 +76,8 @@ class ThingiverseImporter extends BaseImporter {
         $type = "model";
         $thingiverse->getThingFiles($id);
         $files = $thingiverse->response_data;
+
+//        error_log(var_export($files, true), 3, "error.log");
 
         foreach ($files as $position => $file) {
             $filename = $file->name;
