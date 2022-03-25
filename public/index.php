@@ -31,7 +31,7 @@ spl_autoload_register(function ($class_name) {
 $app = AppFactory::create();
 
 // Catch CORS Options requests
-$app->options('/{routes:.+}', function ($response) {
+$app->options('/{routes:.+}', function ($request, $response) {
     return $response;
 });
 
