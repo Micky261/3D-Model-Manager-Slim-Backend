@@ -4,3 +4,4 @@ app-config.json
 upload/*/*
 upload_temp/*/*
 .run
+*.log

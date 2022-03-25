@@ -76,7 +76,7 @@ class ThingiverseImporter extends BaseImporter {
             $filename = $file->name;
             $path = ModelFile::getFileTypePath($userId, $modelId, $type);
 
-            $size = ModelFile::moveFileOnDisk($file->direct_url, $path, $filename);
+            $size = ModelFile::moveFileOnDisk($file->public_url, $path, $filename);
             if ($size != false) {
                 ModelFile::createFileDBEntry($userId, $modelId, $type, $filename, $size, $position + 1);
             }
