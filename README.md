@@ -23,6 +23,20 @@ Register an app on [MyMiniFactory](https://www.myminifactory.com/settings/develo
 Logging in with the API is not possible yet.<br />
 It works, because only read-only API endpoints are used.
 
+### Sketchfab
+#### Variant 1: Use only freely available endpoints
+Leave the `api-token` empty, only data freely available on the API will be used to import.
+
+This unfortunately excludes downloads of 3D models.
+
+#### Variant 2: Use your personal access token
+In the [password settings](https://sketchfab.com/settings/password) get your API token and put it into the `app-config.json` file. 
+
+This token is for your personal use only!
+
+#### Variant 3: Let your users login
+Logging in with the API is not possible yet.
+
 ## Developer setup
 ### Dependencies
 Check out the repository and in the root directory install all dependencies with

@@ -3,7 +3,6 @@
 namespace App\Importer;
 
 use App\Utils\Configuration;
-use Exception;
 
 abstract class BaseImporter {
     public static function getEnabledImporters(): array {
@@ -23,13 +22,11 @@ abstract class BaseImporter {
         return in_array($importer, BaseImporter::getEnabledImporters());
     }
 
-    /**
-     * @throws Exception If importer not found
-     */
     public static function getImporter(string $importer): BaseImporter|null {
         return match ($importer) {
             "thingiverse" => new ThingiverseImporter(),
             "myminifactory" => new MyMiniFactoryImporter(),
+            "sketchfab" => new SketchfabImporter(),
             default => null
         };
     }

@@ -28,6 +28,10 @@
         "thingiverse": {
             "enabled": false,
             "app-token": ""
+        },
+        "sketchfab": {
+            "enabled": true,
+            "api-token": ""
         }
     }
 }

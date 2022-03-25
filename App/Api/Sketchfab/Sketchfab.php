@@ -1,34 +1,40 @@
 <?php
 
-namespace App\Api\MyMiniFactory;
+namespace App\Api\Sketchfab;
 
 /**
  * This API class is loosely based on the Thingiverse API wrapper (\App\Api\Thingiverse)
  */
-class MyMiniFactory {
-    const BASE_URL = 'https://www.myminifactory.com/api/v2/';
-    public string $access_token;
+class Sketchfab {
+    const BASE_URL = 'https://api.sketchfab.com/v3/';
+    public string $personal_token;
 
 
-    public function __construct($token) {
-        $this->access_token = $token;
+    public function __construct($personal_token = "") {
+        $this->personal_token = $personal_token;
     }
 
-    public function getObject($id) {
-        $url = self::BASE_URL . 'objects/' . $id;
+    public function getModel($id) {
+        $url = self::BASE_URL . 'models/' . $id;
 
         return $this->_send($url);
     }
 
-    protected function _send($url, $type = 'GET', $post_params = null) {
-        if (empty($this->access_token))
-            exit('No access token.');
+    public function getModelFiles($id) {
+        $url = self::BASE_URL . 'models/' . $id . "/download";
+
+        return $this->_send($url, true);
+    }
+
+    protected function _send($url, $needs_auth = false, $type = 'GET', $post_params = null) {
+        if ($needs_auth && empty($this->personal_token))
+            exit('No personal token.');
         if (empty($url))
             exit('No URL.');
 
         $curl = curl_init();
 
-        curl_setopt($curl, CURLOPT_URL, $url . "?key=" . $this->access_token);
+        curl_setopt($curl, CURLOPT_URL, $url . "?key=" . $this->personal_token);
 
         $type = strtoupper($type);
         switch ($type) {
@@ -41,6 +47,12 @@ class MyMiniFactory {
                 break;
             default:
                 exit("Invalid request type: '$type'.");
+        }
+
+        if ($needs_auth) {
+            $header = array();
+            $header[] = "Authorization: Token " . $this->personal_token;
+            curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
         }
 
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
