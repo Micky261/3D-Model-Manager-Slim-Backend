@@ -23,7 +23,7 @@
     "importer": {
         "myminifactory": {
             "enabled": false,
-            "api_key": ""
+            "api-key": ""
         },
         "thingiverse": {
             "enabled": false,

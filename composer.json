@@ -1,9 +1,11 @@
 {
     "require": {
+        "ext-curl": "*",
         "ext-json": "*",
         "ext-pdo": "*",
         "faapz/pdo": "^2.2",
         "guzzlehttp/psr7": "^2.2",
+        "league/html-to-markdown": "^5.1",
         "nelexa/zip": "^4.0",
         "php-di/slim-bridge": "^3.2",
         "psr/container": "^1.0.0",
