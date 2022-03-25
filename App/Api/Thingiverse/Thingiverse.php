@@ -19,7 +19,6 @@ namespace App\Api\Thingiverse;
  *
  */
 class Thingiverse {
-
     const BASE_URL = 'https://api.thingiverse.com/';
 
     public $access_token;

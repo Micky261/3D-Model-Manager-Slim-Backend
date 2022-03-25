@@ -39,7 +39,6 @@ class ThingiverseImporter extends BaseImporter {
          * Get tags
          */
         // Uses the $thing object
-
         foreach ($thing->tags as $tag) {
             ModelTag::createTag($userId, $modelId, $tag->name);
         }
