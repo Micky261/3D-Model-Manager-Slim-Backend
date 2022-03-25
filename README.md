@@ -17,6 +17,12 @@ Register an app on [Thingiverse](https://www.thingiverse.com/apps/create). After
 Please note that this app token is for your personal use (testing/development). Logging in with the API is not possible yet.<br />
 It works, because only read-only API endpoints are used.
 
+### MyMiniFactory
+Register an app on [MyMiniFactory](https://www.myminifactory.com/settings/developer/application). After the creation you can generate an API Key, which needs to be put into the `app-config.json` file.
+
+Logging in with the API is not possible yet.<br />
+It works, because only read-only API endpoints are used.
+
 ## Developer setup
 ### Dependencies
 Check out the repository and in the root directory install all dependencies with
