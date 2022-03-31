@@ -104,9 +104,6 @@ class ModelController {
                 ))
                 ->execute();
 
-            $model = Model::getModel($userId, $modelId);
-            $model["links"] = json_decode($model["links"]);
-
             $response->getBody()->write(json_encode($model));
             return $response;
         }
