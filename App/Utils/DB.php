@@ -2,6 +2,7 @@
 
 namespace App\Utils;
 
+use FaaPz\PDO\Clause\Raw;
 use FaaPz\PDO\Database;
 
 /**
@@ -40,6 +41,16 @@ class DB {
     public static function generateSessionId(int $length = 64): string {
         $length = ($length < 4) ? 4 : $length;
         return bin2hex(random_bytes(($length - ($length % 2)) / 2));
+    }
+
+    public static function boolValue(mixed $val): mixed {
+        if (Configuration::database()["db"] == "mysql") {
+            $val = is_bool($val) ? ($val ? 'true' : 'false') : $val;
+            $val = is_numeric($val) ? ($val == 1 ? 'true' : 'false') : $val;
+            return new Raw($val);
+        }
+
+        return $val;
     }
 }
 

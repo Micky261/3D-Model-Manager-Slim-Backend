@@ -29,7 +29,7 @@ class ModelController {
         $modelId = Model::createModel($userId, $body["name"], $body["links"], $body["description"], $body["notes"], $body["favorite"], $body["author"], $body["licence"]);
 
         $model = Model::getModel($userId, $modelId);
-        $model["links"] = json_decode($model["links"]);
+        $model["links"] = is_null($model["links"]) ? array() : json_decode($model["links"]);
 
         $response->getBody()->write(json_encode($model, true));
         return $response;
@@ -63,10 +63,9 @@ class ModelController {
                     "links" => json_encode($body["links"]),
                     "description" => $body["description"],
                     "notes" => $body["notes"],
-                    "favorite" => var_export($body["favorite"], true),
+                    "favorite" => DB::boolValue($body["favorite"]),
                     "author" => $body["author"],
-                    "licence" => $body["licence"],
-                    "updated_at" => time()
+                    "licence" => $body["licence"]
                 ])
                 ->table("models")
                 ->where(new Grouping(

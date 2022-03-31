@@ -47,7 +47,7 @@ class Model {
                 json_encode($links, true),
                 $description,
                 $notes,
-                var_export($favorite, true),
+                DB::boolValue($favorite),
                 $author,
                 $licence,
                 $imported_name,
