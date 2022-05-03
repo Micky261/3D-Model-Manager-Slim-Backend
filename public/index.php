@@ -62,6 +62,8 @@ $app->group("/api", function (RouteCollectorProxy $group) {
         $group->group("/models", function (RouteCollectorProxy $group) {
             // Get all models
             $group->get("", [ModelController::class, "getAllModels"]);
+            // Get all models
+            $group->get("/with-tags", [ModelController::class, "getAllModelsWithTags"]);
             // Get a list of {num} random models
             $group->get("/random/{num:[0-9]+}", [ModelController::class, "getRandomModels"]);
             // Get a list of the {num} newest models

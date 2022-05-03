@@ -22,6 +22,21 @@ class ModelController {
         return $response;
     }
 
+    public function getAllModelsWithTags(Request $request, Response $response): Response {
+        $userId = $request->getAttribute("sessionUserId");
+
+        $models = DB::connection()->select()->from("models_with_tags")
+            ->where(new Conditional("user_id", "=", $userId))
+            ->execute()->fetchAll();
+
+        foreach ($models as $model) {
+            $model["tags"] = explode("\x1F", $model["tags"]);
+        }
+
+        $response->getBody()->write(json_encode($models));
+        return $response;
+    }
+
     public function createModel(Request $request, Response $response): Response {
         $userId = $request->getAttribute("sessionUserId");
         $body = $request->getParsedBody();
