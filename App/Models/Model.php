@@ -7,6 +7,9 @@ use FaaPz\PDO\Clause\Conditional;
 use FaaPz\PDO\Clause\Grouping;
 
 class Model {
+    public static array $searchableFields = ["user_id", "name", "description", "notes", "author", "licence",
+        "imported_name", "imported_description", "imported_author", "imported_licence", "import_source"];
+
     public static function createModel(
         // Base information
         int    $userId,
@@ -64,7 +67,6 @@ class Model {
         return -1;
     }
 
-
     public static function getModel(int $userId, int $modelId) {
         return DB::connection()
             ->select()
@@ -78,5 +80,30 @@ class Model {
             )
             ->execute()
             ->fetch();
+    }
+
+    public static function searchModels(int $userId, string $searchTerm, array $searchFields): bool|array {
+        $searchFields = array_intersect($searchFields,Model::$searchableFields);
+
+        $searches = array();
+        foreach ($searchFields as $f) {
+            $searches[] = new Conditional($f, "LIKE", "%$searchTerm%");
+        }
+
+        return DB::connection()
+            ->select()
+            ->from("models")
+            ->where(
+                new Grouping(
+                    "AND",
+                    new Conditional("user_id", "=", $userId),
+                    new Grouping(
+                        "OR",
+                        ...$searches
+                    )
+                )
+            )
+            ->execute()
+            ->fetchAll();
     }
 }

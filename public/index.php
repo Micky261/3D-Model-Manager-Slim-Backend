@@ -5,6 +5,7 @@ use App\Controller\ImportController;
 use App\Controller\ModelFilesController;
 use App\Controller\ModelTagsController;
 use App\Controller\ModelController;
+use App\Controller\SearchController;
 use App\Controller\VerificationController;
 use App\Middleware\AuthMiddleware;
 use App\Middleware\CORSMiddleware;
@@ -130,6 +131,14 @@ $app->group("/api", function (RouteCollectorProxy $group) {
             $group->get("/enabled", [ImportController::class, "getEnabledImporters"]);
             // Import
             $group->post("/{importer}", [ImportController::class, "import"]);
+        });
+
+        /**
+         * Search
+         */
+        $group->group("/search", function (RouteCollectorProxy $group) {
+            // Search models (search based on given fields)
+            $group->get("/models/{search-term}/{fields}", [SearchController::class, "searchModels"]);
         });
     })->add(new VerifiedMiddleware())->add(new AuthMiddleware());
 });

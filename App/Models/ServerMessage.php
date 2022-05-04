@@ -7,7 +7,7 @@ class ServerMessage {
         public string $message,
         public string $message_code,
         public int    $model_id = 0,
-        public mixed $additional_information = "" // Array or String depending on use case
+        public mixed  $additional_information = "" // Array or String depending on use case
     ) {
     }
 
