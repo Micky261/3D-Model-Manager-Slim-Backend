@@ -8,7 +8,7 @@ namespace App\Utils;
 class Configuration {
     private static bool $loaded = false;
     private static Configuration $instance;
-    private mixed $config;
+    private array $config;
 
     private function __construct() {
         $this->config = json_decode(file_get_contents('../app-config.json'), true);
