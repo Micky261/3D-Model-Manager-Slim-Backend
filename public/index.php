@@ -21,9 +21,9 @@ require __DIR__ . '/../vendor/autoload.php';
  * Autoload all classes under App\
  */
 spl_autoload_register(function ($class_name) {
-    if (file_exists(__DIR__ . "/../$class_name.php")) {
-        /** @noinspection PhpIncludeInspection */
-        require __DIR__ . "/../$class_name.php";
+    $file = str_replace("\\", "/", __DIR__ . "/../$class_name.php");
+    if (file_exists($file)) {
+        require $file;
         return true;
     }
     return false;
