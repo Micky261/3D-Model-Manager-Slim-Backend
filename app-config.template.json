@@ -1,6 +1,7 @@
 {
     "general": {
-        "enable-cors": false
+        "enable-cors": false,
+        "base-dir": "/"
     },
     "database": {
         "db": "mysql",

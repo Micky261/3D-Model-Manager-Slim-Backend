@@ -11,6 +11,7 @@ use App\Middleware\AuthMiddleware;
 use App\Middleware\CORSMiddleware;
 use App\Middleware\ContentTypeMiddleware;
 use App\Middleware\VerifiedMiddleware;
+use App\Utils\Configuration;
 use Slim\Exception\HttpNotFoundException;
 use Slim\Factory\AppFactory;
 use Slim\Routing\RouteCollectorProxy;
@@ -30,19 +31,20 @@ spl_autoload_register(function ($class_name) {
 });
 
 $app = AppFactory::create();
+$baseDir = Configuration::general()["base-dir"];
 
 // Catch CORS Options requests
-$app->options('/{routes:.+}', function ($request, $response) {
+$app->options("$baseDir/{routes:.+}", function ($request, $response) {
     return $response;
 });
 
-$app->get('/version', function ($request, $response) {
+$app->get("$baseDir/version", function ($request, $response) {
     $response->getBody()->write("0.1.0");
     return $response->withHeader("Content-Type", "text/plain");
 });
 
 // API
-$app->group("/api", function (RouteCollectorProxy $group) {
+$app->group("$baseDir/api", function (RouteCollectorProxy $group) {
     // Login / Register
     $group->post("/login", [AuthController::class, "login"]);
     $group->post("/register", [AuthController::class, "register"]);
@@ -148,7 +150,7 @@ $app->group("/api", function (RouteCollectorProxy $group) {
  * Catch-all route to serve a 404 Not Found page if none of the routes match
  * NOTE: make sure this route is defined last
  */
-$app->map(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], '/{routes:.+}', function ($request) {
+$app->map(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], "$baseDir/{routes:.+}", function ($request) {
     throw new HttpNotFoundException($request);
 });
 
