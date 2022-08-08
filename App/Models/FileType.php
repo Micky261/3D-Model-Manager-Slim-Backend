@@ -71,7 +71,8 @@ class FileType {
         "image" => ["png", "tif", "tiff", "jpg", "bmp", "jpeg", "jpe"],
         "video" => ["mp4", "mpg", "mpeg", "avi", "webm", "mkv", "mpg4", "mov", "3gp"],
         "pdf" => ["pdf"],
-        "3d" => ["stl", "obj"]
+        "model" => ["stl", "obj"],
+        "sliced" => ["gcode", "pwmo"]
     ];
 
     public static function getMimeType($extension): string {
