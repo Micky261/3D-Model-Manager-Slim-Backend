@@ -33,6 +33,9 @@
         "sketchfab": {
             "enabled": true,
             "api-token": ""
+        },
+        "printables": {
+            "enabled": true
         }
     }
 }

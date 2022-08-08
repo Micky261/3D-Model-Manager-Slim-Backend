@@ -27,6 +27,7 @@ abstract class BaseImporter {
             "thingiverse" => new ThingiverseImporter(),
             "myminifactory" => new MyMiniFactoryImporter(),
             "sketchfab" => new SketchfabImporter(),
+            "printables" => new PrintablesImporter(),
             default => null
         };
     }
