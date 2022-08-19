@@ -83,7 +83,7 @@ class Model {
     }
 
     public static function searchModels(int $userId, string $searchTerm, array $searchFields): bool|array {
-        $searchFields = array_intersect($searchFields,Model::$searchableFields);
+        $searchFields = array_intersect($searchFields, Model::$searchableFields);
 
         $searches = array();
         foreach ($searchFields as $f) {

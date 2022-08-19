@@ -20,12 +20,6 @@ class Sketchfab {
         return $this->_send($url);
     }
 
-    public function getModelFiles($id) {
-        $url = self::BASE_URL . 'models/' . $id . "/download";
-
-        return $this->_send($url, true);
-    }
-
     protected function _send($url, $needs_auth = false, $type = 'GET', $post_params = null) {
         if ($needs_auth && empty($this->personal_token))
             exit('No personal token.');
@@ -86,5 +80,11 @@ class Sketchfab {
         // $this->_reset();
 
         return json_decode($response_body);
+    }
+
+    public function getModelFiles($id) {
+        $url = self::BASE_URL . 'models/' . $id . "/download";
+
+        return $this->_send($url, true);
     }
 }

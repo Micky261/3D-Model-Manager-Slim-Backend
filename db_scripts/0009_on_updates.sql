@@ -1,0 +1,5 @@
+ALTER TABLE users
+    MODIFY updated_at TIMESTAMP DEFAULT current_timestamp() NOT NULL ON UPDATE CURRENT_TIMESTAMP;
+
+ALTER TABLE model_files
+    MODIFY updated_at TIMESTAMP DEFAULT current_timestamp() NOT NULL ON UPDATE CURRENT_TIMESTAMP;

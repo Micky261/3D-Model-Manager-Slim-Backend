@@ -4,8 +4,8 @@ namespace App\Importer;
 
 use App\Api\Sketchfab\Sketchfab;
 use App\Models\Model;
-use App\Models\ModelFile;
 use App\Models\ModelTag;
+use App\Storage\FileSystem;
 use App\Utils\Configuration;
 use Exception;
 
@@ -17,6 +17,10 @@ class SketchfabImporter extends BaseImporter {
         if (!BaseImporter::isEnabled("sketchfab")) {
             throw new Exception("Sketchfab importer is disabled");
         }
+    }
+
+    public function __destruct() {
+        FileSystem::removeTempFolders();
     }
 
     public function import(int $userId, array $args): string {
@@ -65,33 +69,23 @@ class SketchfabImporter extends BaseImporter {
          */
         $type = "image";
 //        foreach ($model->images as $position => $image) {
-        $filename = basename($model->thumbnails->images[0]->url);
-        $path = ModelFile::getFileTypePath($userId, $modelId, $type);
-
-        $size = ModelFile::moveFileOnDisk($model->thumbnails->images[0]->url, $path, $filename);
-
-        if ($size != false) {
-            ModelFile::createFileDBEntry($userId, $modelId, $type, $filename, $size, 1);
-        }
+        $url = $model->thumbnails->images[0]->url;
+        $filename = basename($url);
+        self::storeFile($url, $userId, $modelId, $type, $filename, 1);
 //        }
 
         /**
          * Get thing files and import them
          */
         if ($model->isDownloadable && $personalApiKeyAvailable) {
+            $type = "model";
             $files = $sketchfab->getModelFiles($id);
 
-            $type = "model";
-            $position = 1;
+            $position = 1; // $files is not index numerically
             foreach ($files as $file) {
                 $filename = basename(parse_url($file->url, PHP_URL_PATH));
-                $path = ModelFile::getFileTypePath($userId, $modelId, $type);
-
-                $size = ModelFile::moveFileOnDisk($file->url, $path, $filename);
-                if ($size != false) {
-                    ModelFile::createFileDBEntry($userId, $modelId, $type, $filename, $size, $position);
-                    $position++;
-                }
+                self::storeFile($file->url, $userId, $modelId, $type, $filename, $position);
+                $position++;
             }
         }
 

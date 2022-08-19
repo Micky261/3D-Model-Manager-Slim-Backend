@@ -4,11 +4,10 @@ namespace App\Importer;
 
 use App\Api\MyMiniFactory\MyMiniFactory;
 use App\Models\Model;
-use App\Models\ModelFile;
 use App\Models\ModelTag;
+use App\Storage\FileSystem;
 use App\Utils\Configuration;
 use Exception;
-use League\HTMLToMarkdown\Converter\TableConverter;
 use League\HTMLToMarkdown\HtmlConverter;
 
 class MyMiniFactoryImporter extends BaseImporter {
@@ -23,12 +22,11 @@ class MyMiniFactoryImporter extends BaseImporter {
             throw new Exception("MyMiniFactory importer is disabled");
         }
 
-        $this->htmlConverter = new HtmlConverter();
-        $this->htmlConverter->getConfig()->setOption('strip_tags', true);
-        $this->htmlConverter->getConfig()->setOption('italic_style', '*');
-        $this->htmlConverter->getConfig()->setOption('bold_style', '**');
-        $this->htmlConverter->getConfig()->setOption('hard_break', true);
-        $this->htmlConverter->getEnvironment()->addConverter(new TableConverter());
+        $this->htmlConverter = self::getHtmlConvert();
+    }
+
+    public function __destruct() {
+        FileSystem::removeTempFolders();
     }
 
     public function import(int $userId, array $args): string {
@@ -69,30 +67,22 @@ class MyMiniFactoryImporter extends BaseImporter {
          * Get thing images and import them
          */
         $type = "image";
-        foreach ($object->images as $position => $image) {
-            $filename = basename($image->original->url);
-            $path = ModelFile::getFileTypePath($userId, $modelId, $type);
+        foreach ($object->images as $pos => $image) {
+            $url = $image->original->url;
+            $filename = basename($url);
 
-            $size = ModelFile::moveFileOnDisk($image->original->url, $path, $filename);
-
-            if ($size != false) {
-                ModelFile::createFileDBEntry($userId, $modelId, $type, $filename, $size, $position + 1);
-            }
+            self::storeFile($url, $userId, $modelId, $type, $filename, $pos + 1);
         }
 
         /**
          * Get thing files and import them
          */
         $type = "model";
-        foreach ($object->files->items as $position => $file) {
+        foreach ($object->files->items as $pos => $file) {
             $filename = $file->filename;
-            $path = ModelFile::getFileTypePath($userId, $modelId, $type);
-
             $download = sprintf($this->downloadFile, $id, $filename);
-            $size = ModelFile::moveFileOnDisk($download, $path, $filename);
-            if ($size != false) {
-                ModelFile::createFileDBEntry($userId, $modelId, $type, $filename, $size, $position + 1);
-            }
+
+            self::storeFile($download, $userId, $modelId, $type, $filename, $pos + 1);
         }
 
         return $modelId;

@@ -37,5 +37,21 @@
         "printables": {
             "enabled": true
         }
-    }
+    },
+    "storage": [
+        {
+            "name": "Default",
+            "url": "/",
+            "capacity": "25G",
+            "type": "local"
+        },
+        {
+            "name": "Personal Nextcloud",
+            "url": "https://nc.example.com/remote.php/dav/files/<username>/<path to subfolder>/",
+            "capacity": "25G",
+            "type": "webdav",
+            "username": "username",
+            "password": "app-password"
+        }
+    ]
 }

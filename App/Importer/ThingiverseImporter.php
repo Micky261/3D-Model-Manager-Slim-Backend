@@ -3,10 +3,9 @@
 namespace App\Importer;
 
 use App\Api\Thingiverse\Thingiverse;
-use App\Models\FileType;
 use App\Models\Model;
-use App\Models\ModelFile;
 use App\Models\ModelTag;
+use App\Storage\FileSystem;
 use App\Utils\Configuration;
 use Exception;
 
@@ -18,6 +17,10 @@ class ThingiverseImporter extends BaseImporter {
         if (!BaseImporter::isEnabled("thingiverse")) {
             throw new Exception("Thingiverse importer is disabled");
         }
+    }
+
+    public function __destruct() {
+        FileSystem::removeTempFolders();
     }
 
     public function import(int $userId, array $args): string {
@@ -50,22 +53,15 @@ class ThingiverseImporter extends BaseImporter {
         $type = "image";
         $thingiverse->getThingImages($id);
         $images = $thingiverse->response_data;
-
-        foreach ($images as $position => $image) {
+        foreach ($images as $pos => $image) {
             $filename = $image->name;
-            $path = ModelFile::getFileTypePath($userId, $modelId, $type);
 
             foreach ($image->sizes as $imageSize) {
                 if ($imageSize->type === "display" && $imageSize->size === "large") {
-                    if (count(explode(".",$filename)) == 1) {
+                    if (count(explode(".", $filename)) == 1) {
                         $filename .= "." . pathinfo($imageSize->url, PATHINFO_EXTENSION);
                     }
-
-                    $size = ModelFile::moveFileOnDisk($imageSize->url, $path, $filename);
-
-                    if ($size != false) {
-                        ModelFile::createFileDBEntry($userId, $modelId, $type, $filename, $size, $position + 1);
-                    }
+                    self::storeFile($imageSize->url, $userId, $modelId, $type, $filename, $pos + 1);
                 }
             }
         }
@@ -76,17 +72,9 @@ class ThingiverseImporter extends BaseImporter {
         $type = "model";
         $thingiverse->getThingFiles($id);
         $files = $thingiverse->response_data;
-
 //        error_log(var_export($files, true), 3, "error.log");
-
-        foreach ($files as $position => $file) {
-            $filename = $file->name;
-            $path = ModelFile::getFileTypePath($userId, $modelId, $type);
-
-            $size = ModelFile::moveFileOnDisk($file->public_url, $path, $filename);
-            if ($size != false) {
-                ModelFile::createFileDBEntry($userId, $modelId, $type, $filename, $size, $position + 1);
-            }
+        foreach ($files as $pos => $file) {
+            self::storeFile($file->public_url, $userId, $modelId, $type, $file->name, $pos + 1);
         }
 
         return $modelId;

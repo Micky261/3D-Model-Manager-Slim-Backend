@@ -4,10 +4,9 @@ namespace App\Importer;
 
 use App\Api\Printables\Printables;
 use App\Models\Model;
-use App\Models\ModelFile;
 use App\Models\ModelTag;
+use App\Storage\FileSystem;
 use Exception;
-use League\HTMLToMarkdown\Converter\TableConverter;
 use League\HTMLToMarkdown\HtmlConverter;
 
 class PrintablesImporter extends BaseImporter {
@@ -24,12 +23,11 @@ class PrintablesImporter extends BaseImporter {
             throw new Exception("Printables importer is disabled");
         }
 
-        $this->htmlConverter = new HtmlConverter();
-        $this->htmlConverter->getConfig()->setOption('strip_tags', true);
-        $this->htmlConverter->getConfig()->setOption('italic_style', '*');
-        $this->htmlConverter->getConfig()->setOption('bold_style', '**');
-        $this->htmlConverter->getConfig()->setOption('hard_break', true);
-        $this->htmlConverter->getEnvironment()->addConverter(new TableConverter());
+        $this->htmlConverter = self::getHtmlConvert();
+    }
+
+    public function __destruct() {
+        FileSystem::removeTempFolders();
     }
 
     public function import(int $userId, array $args): string {
@@ -68,27 +66,15 @@ class PrintablesImporter extends BaseImporter {
          * Get thing images and import them
          */
         $type = "image";
-        foreach ($object->images as $position => $image) {
+        foreach ($object->images as $pos => $image) {
             $filename = basename($image->filePath);
-            $path = ModelFile::getFileTypePath($userId, $modelId, $type);
-
-            $size = ModelFile::moveFileOnDisk(self::MEDIA_URL . $image->filePath, $path, $filename);
-
-            if ($size != false) {
-                ModelFile::createFileDBEntry($userId, $modelId, $type, $filename, $size, $position + 1);
-            }
+            self::storeFile(self::MEDIA_URL . $image->filePath, $userId, $modelId, $type, $filename, $pos + 1);
         }
-        $lastImagePosition = ((isset($position) && is_int($position)) ? $position : 0) + 1;
+        $lastImagePosition = ((isset($pos) && is_int($pos)) ? $pos : 0) + 1;
         $previewImages = array_merge($object->gcodes, $object->stls, $object->slas);
-        foreach ($previewImages as $position => $image) {
+        foreach ($previewImages as $pos => $image) {
             $filename = basename($image->filePreviewPath);
-            $path = ModelFile::getFileTypePath($userId, $modelId, $type);
-
-            $size = ModelFile::moveFileOnDisk(self::MEDIA_URL . $image->filePreviewPath, $path, $filename);
-
-            if ($size != false) {
-                ModelFile::createFileDBEntry($userId, $modelId, $type, $filename, $size, $lastImagePosition + $position + 1);
-            }
+            self::storeFile(self::MEDIA_URL . $image->filePreviewPath, $userId, $modelId, $type, $filename, $lastImagePosition + $pos + 1);
         }
 
         /**
@@ -96,25 +82,14 @@ class PrintablesImporter extends BaseImporter {
          */
         $type = "document";
         $filename = basename($object->pdfFilePath);
-        $path = ModelFile::getFileTypePath($userId, $modelId, $type);
-
-        $size = ModelFile::moveFileOnDisk(self::MEDIA_URL . $object->pdfFilePath, $path, $filename);
-        if ($size != false) {
-            ModelFile::createFileDBEntry($userId, $modelId, $type, $filename, $size, 1);
-        }
+        self::storeFile(self::MEDIA_URL . $object->pdfFilePath, $userId, $modelId, $type, $filename, 1);
 
         /**
          * Get stl files and import them
          */
         $type = "model";
-        foreach ($object->stls as $position => $file) {
-            $filename = $file->name;
-            $path = ModelFile::getFileTypePath($userId, $modelId, $type);
-
-            $size = ModelFile::moveFileOnDisk(self::MEDIA_URL . $file->filePath, $path, $filename);
-            if ($size != false) {
-                ModelFile::createFileDBEntry($userId, $modelId, $type, $filename, $size, $position + 1);
-            }
+        foreach ($object->stls as $pos => $file) {
+            self::storeFile(self::MEDIA_URL . $file->filePath, $userId, $modelId, $type, $file->name, $pos + 1);
         }
 
         /**
@@ -122,14 +97,8 @@ class PrintablesImporter extends BaseImporter {
          */
         $type = "sliced";
         $sliced_files = array_merge($object->gcodes, $object->slas);
-        foreach ($sliced_files as $position => $file) {
-            $filename = $file->name;
-            $path = ModelFile::getFileTypePath($userId, $modelId, $type);
-
-            $size = ModelFile::moveFileOnDisk(self::MEDIA_URL . $file->filePath, $path, $filename);
-            if ($size != false) {
-                ModelFile::createFileDBEntry($userId, $modelId, $type, $filename, $size, $position + 1);
-            }
+        foreach ($sliced_files as $pos => $file) {
+            self::storeFile(self::MEDIA_URL . $file->filePath, $userId, $modelId, $type, $file->name, $pos + 1);
         }
 
         return $modelId;

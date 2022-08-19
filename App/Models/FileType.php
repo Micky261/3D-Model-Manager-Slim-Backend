@@ -3,8 +3,6 @@
 namespace App\Models;
 
 class FileType {
-    private static string $unknownMimeType = "application/octet-stream";
-
     public static array $types = [
         "3gp" => "video/3gpp",
         "7z" => "application/x-7z-compressed",
@@ -66,7 +64,6 @@ class FileType {
         "xsl" => "application/xml",
         "zip" => "application/zip"
     ];
-
     public static array $applications = [
         "image" => ["png", "tif", "tiff", "jpg", "bmp", "jpeg", "jpe"],
         "video" => ["mp4", "mpg", "mpeg", "avi", "webm", "mkv", "mpg4", "mov", "3gp"],
@@ -74,6 +71,11 @@ class FileType {
         "model" => ["stl", "obj"],
         "sliced" => ["gcode", "pwmo"]
     ];
+    private static string $unknownMimeType = "application/octet-stream";
+
+    public static function getMimeTypeFromFilename($filename): string {
+        return self::getMimeType(self::getFileExtension($filename));
+    }
 
     public static function getMimeType($extension): string {
         if (array_key_exists($extension, self::$types))
@@ -82,12 +84,12 @@ class FileType {
             return self::$unknownMimeType;
     }
 
-    public static function getMimeTypeFromFilename($filename): string {
-        return self::getMimeType(self::getFileExtension($filename));
+    public static function getFileExtension($filename): string {
+        return pathinfo($filename, PATHINFO_EXTENSION);
     }
 
-    public static function getFileExtension($filename): string {
-        return pathinfo($filename,PATHINFO_EXTENSION);
+    public static function getApplicationFromFilename($filename): string {
+        return self::getApplication(self::getFileExtension($filename));
     }
 
     public static function getApplication($extension): ?string {
@@ -98,9 +100,5 @@ class FileType {
         }
 
         return null;
-    }
-
-    public static function getApplicationFromFilename($filename): string {
-        return self::getApplication(self::getFileExtension($filename));
     }
 }

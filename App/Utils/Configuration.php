@@ -38,4 +38,8 @@ class Configuration {
     public static function mail() {
         return self::getInstance()->config["mail"];
     }
+
+    public static function storage() {
+        return self::getInstance()->config["storage"];
+    }
 }
