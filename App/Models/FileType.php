@@ -71,6 +71,13 @@ class FileType {
         "model" => ["stl", "obj"],
         "sliced" => ["gcode", "pwmo"]
     ];
+    public static array $modelFileType = [
+        "image" => ["png", "tif", "tiff", "jpg", "bmp", "jpeg", "jpe", "mp4", "mpg", "mpeg", "avi", "webm", "mkv", "mpg4", "mov", "3gp"],
+        "diagram" => ["eps"],
+        "document" => ["pdf"],
+        "model" => ["stl", "obj"],
+        "sliced" => ["gcode", "pwmo"]
+    ];
     private static string $unknownMimeType = "application/octet-stream";
 
     public static function getMimeTypeFromFilename($filename): string {
@@ -94,6 +101,20 @@ class FileType {
 
     public static function getApplication($extension): ?string {
         foreach (self::$applications as $key => $value) {
+            if (in_array($extension, $value)) {
+                return $key;
+            }
+        }
+
+        return null;
+    }
+
+    public static function getModelFileTypeFromFilename($filename): string {
+        return self::getModelFileType(self::getFileExtension($filename));
+    }
+
+    public static function getModelFileType($extension): ?string {
+        foreach (self::$modelFileType as $key => $value) {
             if (in_array($extension, $value)) {
                 return $key;
             }

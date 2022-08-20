@@ -32,6 +32,8 @@ abstract class BaseImporter {
             "myminifactory" => new MyMiniFactoryImporter(),
             "sketchfab" => new SketchfabImporter(),
             "printables" => new PrintablesImporter(),
+            "instructables" => new InstructablesImporter(),
+            "cults3d" => new Cults3DImporter(),
             default => null
         };
     }

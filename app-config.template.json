@@ -36,6 +36,11 @@
         },
         "printables": {
             "enabled": true
+        },
+        "cults3d": {
+            "enabled": false,
+            "username": "",
+            "password": ""
         }
     },
     "storage": [
