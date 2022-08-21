@@ -35,6 +35,9 @@ class Cults3DImporter extends BaseImporter {
          */
         $object = $cults3d->getObject($slug)->data->creation;
 
+        $objLicence = $object->license->name;
+        $licence = ($objLicence == null) ? "All Rights Reserved" : $objLicence;
+        
         $modelId = Model::createModel(
             $userId,
             $object->name,
@@ -43,11 +46,11 @@ class Cults3DImporter extends BaseImporter {
             "",
             "",
             $object->creator->nick,
-            $object->license->name,
+            $licence,
             $object->name,
             $object->description,
             $object->creator->nick,
-            $object->license->name,
+            $licence,
             $object->url
         );
 
