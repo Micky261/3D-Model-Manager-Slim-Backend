@@ -16,7 +16,7 @@ class AuthMiddleware {
         /**
          * if (key_exists("3DMM_Session", $_COOKIE)) {
          *     $sessionId = htmlspecialchars($_COOKIE["3DMM_Session"]);
-         **/
+         */
 
         $sessionId = $request->getQueryParams()["3DMM_Session"];
         if (isset($sessionId)) {

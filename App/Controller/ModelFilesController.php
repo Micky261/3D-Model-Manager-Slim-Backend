@@ -161,8 +161,7 @@ class ModelFilesController {
                         ->update([
                             "type" => $newFileType,
                             "filename" => $newFilename,
-                            "position" => $newPosition,
-                            "updated_at" => time()
+                            "position" => $newPosition
                         ])
                         ->table("model_files")
                         ->where(new Grouping(
