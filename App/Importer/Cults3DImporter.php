@@ -37,7 +37,7 @@ class Cults3DImporter extends BaseImporter {
 
         $objLicence = $object->license->name;
         $licence = ($objLicence == null) ? "All Rights Reserved" : $objLicence;
-        
+
         $modelId = Model::createModel(
             $userId,
             $object->name,

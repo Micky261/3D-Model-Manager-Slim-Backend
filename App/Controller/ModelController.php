@@ -108,15 +108,7 @@ class ModelController {
         if ($model !== false) {
             $model["links"] = json_decode($model["links"]);
 
-            DB::connection()
-                ->delete()
-                ->from("models")
-                ->where(new Grouping(
-                    "AND",
-                    new Conditional("id", "=", $modelId),
-                    new Conditional("user_id", "=", $userId)
-                ))
-                ->execute();
+            Model::deleteModel($userId, $modelId);
 
             $response->getBody()->write(json_encode($model));
             return $response;

@@ -55,4 +55,16 @@ class ModelTag {
 
         return -1;
     }
+
+    public static function deleteModelTags(int $userId, int $modelId): bool|\PDOStatement {
+        return DB::connection()
+        ->delete()
+        ->from("model_tags")
+        ->where(new Grouping(
+            "AND",
+            new Conditional("model_id", "=", $modelId),
+            new Conditional("user_id", "=", $userId)
+        ))
+        ->execute();
+    }
 }

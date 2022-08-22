@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Models\FileType;
+use App\Models\Model;
 use App\Models\ModelFile;
 use App\Models\ServerMessage;
 use App\Storage\FileSystem;
@@ -95,22 +96,14 @@ class ModelFilesController {
         $filepath = $storage->getFilePath($userId, $file["model_id"], $file["type"], $file["filename"]);
 
         $storage->deleteFile($filepath);
-        DB::connection()->delete()
-            ->from("model_files")
-            ->where(new Grouping(
-                "AND",
-                new Conditional("id", "=", $fileId),
-                new Conditional("user_id", "=", $userId)
-            ))
-            ->execute();
-//            } else {
+        ModelFile::deleteFile($userId, $fileId);
+
 //                $response->getBody()->write((new ServerMessage(
 //                    "The file could not be deleted.",
 //                    "FileCouldNotBeDeleted",
 //                    additional_information: $fileId
 //                ))->toJson());
 //                return $response->withStatus(409);
-//            }
 
         return $response;
     }
@@ -185,6 +178,9 @@ class ModelFilesController {
         return $response;
     }
 
+    /**
+     * @throws ZipException
+     */
     public function downloadZipFile(Request $request, Response $response, $args): Response {
         $userId = $request->getAttribute("sessionUserId");
         $modelId = $args["id"];

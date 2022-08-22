@@ -82,6 +82,21 @@ class Model {
             ->fetch();
     }
 
+    public static function deleteModel(int $userId, int $modelId): bool|\PDOStatement {
+        ModelFile::deleteModelFiles($userId, $modelId);
+        ModelTag::deleteModelTags($userId, $modelId);
+
+        return DB::connection()
+            ->delete()
+            ->from("models")
+            ->where(new Grouping(
+                "AND",
+                new Conditional("id", "=", $modelId),
+                new Conditional("user_id", "=", $userId)
+            ))
+            ->execute();
+    }
+
     public static function searchModels(int $userId, string $searchTerm, array $searchFields): bool|array {
         $searchFields = array_intersect($searchFields, Model::$searchableFields);
 
